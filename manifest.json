@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "Subscription Sentry",
+  "version": "0.1.0",
+  "description": "Track your subscriptions and get a reality check at checkout pages.",
+  "permissions": ["storage", "activeTab"],
+  "action": {
+    "default_popup": "src/popup/popup.html",
+    "default_title": "Subscription Sentry"
+  },
+  "options_page": "src/options/options.html",
+  "background": {
+    "service_worker": "src/background/service-worker.ts",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["src/content/checkout-detector.ts"],
+      "run_at": "document_idle"
+    }
+  ]
+}

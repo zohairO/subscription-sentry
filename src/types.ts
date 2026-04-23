@@ -1,0 +1,43 @@
+export type Cadence = 'monthly' | 'yearly' | 'weekly' | 'unknown';
+
+export type Source = 'mbox' | 'manual' | 'checkout' | 'history';
+
+export interface Subscription {
+  id: string;
+  service: string;
+  amount: number;
+  currency: string;
+  cadence: Cadence;
+  nextRenewal?: string;
+  source: Source;
+  createdAt: string;
+  updatedAt: string;
+  lastSeenAt?: string;
+  notes?: string;
+  archived?: boolean;
+}
+
+export interface RawMessage {
+  headers: Record<string, string>;
+  body: string;
+}
+
+export interface MboxMatch {
+  service: string;
+  amount?: number;
+  currency?: string;
+  cadence?: Cadence;
+  date?: string;
+  confidence: number;
+  raw: {
+    from: string;
+    subject: string;
+  };
+}
+
+export interface CheckoutSignal {
+  score: number;
+  reasons: string[];
+}
+
+export const DEFAULT_CURRENCY = 'AUD';
