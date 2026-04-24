@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Subscription Sentry — Settings</title>
+    <link rel="stylesheet" href="./options.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Subscription Sentry</h1>
+      <p class="tag">Local only. Nothing leaves your device.</p>
+
+      <section>
+        <h2>Import from Google Takeout</h2>
+        <p class="hint">
+          Export your Gmail from
+          <a href="https://takeout.google.com" target="_blank" rel="noopener">Google Takeout</a>
+          (select Mail only, .mbox format). Drop the resulting <code>.mbox</code> below to
+          scan for known subscription services.
+        </p>
+        <input type="file" id="mbox-file" accept=".mbox" />
+        <div id="mbox-status" class="status"></div>
+        <div id="mbox-matches"></div>
+        <div id="mbox-actions" hidden>
+          <button id="import-matches" class="primary">Import selected</button>
+          <button id="import-cancel">Clear</button>
+        </div>
+      </section>
+
+      <section>
+        <h2>Current subscriptions</h2>
+        <ul id="subs" class="subs"></ul>
+      </section>
+
+      <section>
+        <h2>Settings</h2>
+        <label class="toggle">
+          <input type="checkbox" id="overlay-enabled" />
+          <span>Show checkout-page reminder overlay</span>
+        </label>
+      </section>
+    </main>
+    <script type="module" src="./options.ts"></script>
+  </body>
+</html>
