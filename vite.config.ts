@@ -1,15 +1,9 @@
 import { defineConfig } from 'vite';
-import { crx } from '@crxjs/vite-plugin';
+import { crx, type ManifestV3Export } from '@crxjs/vite-plugin';
 import manifest from './manifest.json' assert { type: 'json' };
-import { resolve } from 'node:path';
 
 export default defineConfig({
-  plugins: [crx({ manifest })],
-  resolve: {
-    alias: {
-      '@': resolve(__dirname, 'src'),
-    },
-  },
+  plugins: [crx({ manifest: manifest as ManifestV3Export })],
   build: {
     target: 'esnext',
     sourcemap: true,
@@ -17,8 +11,5 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: true,
-    hmr: {
-      port: 5173,
-    },
   },
 });
