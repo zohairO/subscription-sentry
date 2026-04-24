@@ -2,6 +2,12 @@ export type Cadence = 'monthly' | 'yearly' | 'weekly' | 'unknown';
 
 export type Source = 'mbox' | 'manual' | 'checkout' | 'history';
 
+export interface SourceEvent {
+  source: Source;
+  at: string;
+  snapshot?: Partial<Pick<Subscription, 'amount' | 'currency' | 'cadence' | 'nextRenewal'>>;
+}
+
 export interface Subscription {
   id: string;
   service: string;
@@ -9,7 +15,7 @@ export interface Subscription {
   currency: string;
   cadence: Cadence;
   nextRenewal?: string;
-  source: Source;
+  sources: SourceEvent[];
   createdAt: string;
   updatedAt: string;
   lastSeenAt?: string;
