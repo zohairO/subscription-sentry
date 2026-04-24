@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Subscription Sentry</title>
+    <link rel="stylesheet" href="./popup.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Subscriptions</h1>
+      <button id="open-options" title="Settings" aria-label="Settings">⚙</button>
+    </header>
+
+    <div id="total" aria-live="polite">—</div>
+
+    <ul id="list" aria-label="Tracked subscriptions"></ul>
+
+    <section id="add-form" hidden>
+      <input id="f-service" type="text" placeholder="Service (e.g. Netflix)" autocomplete="off" />
+      <div class="row">
+        <input id="f-amount" type="number" step="0.01" min="0" placeholder="Amount" />
+        <select id="f-currency" aria-label="Currency">
+          <option>AUD</option>
+          <option>USD</option>
+          <option>EUR</option>
+          <option>GBP</option>
+          <option>NZD</option>
+          <option>CAD</option>
+        </select>
+        <select id="f-cadence" aria-label="Cadence">
+          <option value="monthly">monthly</option>
+          <option value="yearly">yearly</option>
+          <option value="weekly">weekly</option>
+        </select>
+      </div>
+      <div class="row">
+        <button id="f-save" class="primary">Save</button>
+        <button id="f-cancel">Cancel</button>
+      </div>
+      <div id="f-error" class="error" hidden></div>
+    </section>
+
+    <footer>
+      <button id="add">＋ Add manually</button>
+    </footer>
+
+    <script type="module" src="./popup.ts"></script>
+  </body>
+</html>
