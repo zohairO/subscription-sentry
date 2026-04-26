@@ -8,22 +8,39 @@
   <body>
     <main>
       <h1>Subscription Sentry</h1>
-      <p class="tag">Local only. Nothing leaves your device.</p>
+      <p class="tag">Local only. Gmail metadata read directly; nothing else leaves your device.</p>
 
       <section>
-        <h2>Import from Google Takeout</h2>
+        <h2>Connect Gmail</h2>
         <p class="hint">
-          Export your Gmail from
-          <a href="https://takeout.google.com" target="_blank" rel="noopener">Google Takeout</a>
-          (select Mail only, .mbox format). Drop the resulting <code>.mbox</code> below to
-          scan for known subscription services.
+          Connect your Gmail to scan for known subscription services. We use
+          the <code>gmail.metadata</code> scope, which means we read sender,
+          subject, and date — never email bodies. You stay in control: revoke
+          anytime.
         </p>
-        <input type="file" id="mbox-file" accept=".mbox" />
-        <div id="mbox-status" class="status"></div>
-        <div id="mbox-matches"></div>
-        <div id="mbox-actions" hidden>
-          <button id="import-matches" class="primary">Import selected</button>
-          <button id="import-cancel">Clear</button>
+        <div id="auth-status" class="status"></div>
+        <div class="row">
+          <button id="connect-btn" class="primary">Connect Gmail</button>
+          <button id="scan-btn" class="primary" hidden>Scan inbox</button>
+          <button id="disconnect-btn" hidden>Disconnect</button>
+        </div>
+
+        <div id="scan-progress" class="status" hidden></div>
+        <div id="scan-error" class="status error" hidden></div>
+
+        <div id="matches" hidden>
+          <div class="matches-header">
+            <span>Service</span>
+            <span>Amount</span>
+            <span>Currency</span>
+            <span>Cadence</span>
+            <span>Confidence</span>
+          </div>
+          <div id="matches-list"></div>
+          <div class="matches-footer">
+            <button id="import-btn" class="primary">Import selected</button>
+            <button id="cancel-btn">Discard</button>
+          </div>
         </div>
       </section>
 

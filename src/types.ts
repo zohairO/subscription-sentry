@@ -1,6 +1,6 @@
 export type Cadence = 'monthly' | 'yearly' | 'weekly' | 'unknown';
 
-export type Source = 'mbox' | 'manual' | 'checkout' | 'history';
+export type Source = 'gmail' | 'manual' | 'checkout' | 'history' | 'mbox';
 
 export interface SourceEvent {
   source: Source;
@@ -23,12 +23,7 @@ export interface Subscription {
   archived?: boolean;
 }
 
-export interface RawMessage {
-  headers: Record<string, string>;
-  body: string;
-}
-
-export interface MboxMatch {
+export interface ServiceMatch {
   service: string;
   amount?: number;
   currency?: string;

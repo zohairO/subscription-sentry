@@ -3,7 +3,12 @@
   "name": "Subscription Sentry",
   "version": "0.1.0",
   "description": "Track your subscriptions and get a reality check at checkout pages.",
-  "permissions": ["storage", "activeTab"],
+  "permissions": ["storage", "activeTab", "identity"],
+  "host_permissions": ["https://gmail.googleapis.com/*"],
+  "oauth2": {
+    "client_id": "REPLACE_WITH_YOUR_OAUTH_CLIENT_ID.apps.googleusercontent.com",
+    "scopes": ["https://www.googleapis.com/auth/gmail.metadata"]
+  },
   "action": {
     "default_popup": "src/popup/popup.html",
     "default_title": "Subscription Sentry"
