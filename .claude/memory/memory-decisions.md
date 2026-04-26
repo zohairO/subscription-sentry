@@ -4,6 +4,11 @@ Date-stamped architectural and product decisions. Most recent at top.
 
 ---
 
+## 2026-04-26
+
+- going through google takeout is too slow and introduces a lot of friction for a user as it can take upto for the data to be ready to be dropped into the extension. A faster and better solution that mitigates the friction is to use OAuth and make API requests in chunks to get users gmail data. (READ THIS BEFORE NEXT SESSION)
+
+
 ## 2026-04-24
 
 - **Memory system set up.** Four project-scoped memory files under `.claude/memory/` (profile, preferences, decisions, sessions). CLAUDE.md mandates update-as-you-go.
