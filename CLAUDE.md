@@ -4,8 +4,8 @@ Chrome MV3 extension that tracks recurring subscriptions and shows a reminder ov
 
 ## Before writing any code
 
-1. Read `.claude/rules/architecture.md` once per session — it owns the big-picture decisions (data model, permissions, library extraction rules, v1 done criteria, known tensions). Don't duplicate it here; lean on it.
-2. Check `src/types.ts` to see whether the Design A `sources[]` migration has landed yet. Storage and UI work depends on it.
+1. Read `.claude/rules/architecture.md` once per session — it owns the big-picture decisions (data model, permissions, OAuth scope, email-source path comparison, library extraction rules, v1 done criteria, known tensions). Don't duplicate it here; lean on it.
+2. Confirm `src/types.ts` is on Design A (Subscription has `sources: SourceEvent[]`). Storage and UI assume it.
 
 ## Run it
 
@@ -23,13 +23,15 @@ npm run typecheck   # before every commit
 npm run build       # production bundle
 ```
 
-No test runner is wired up yet. When tests get added, matchers and the mbox parser are the obvious first targets.
+No test runner is wired up yet. When tests get added, matchers and `gmail-api.ts` are the obvious first targets.
 
 ## Non-negotiable rules
 
-- **No network calls against user data.** No telemetry, analytics, error reporting, remote logging. Ever.
-- **No `host_permissions` in `manifest.json`.** If a feature seems to need one, stop and reread architecture.md.
-- **No `chrome.*` or DOM imports in `src/lib/`** — `storage.ts` is the one allowed exception.
+- **No telemetry, analytics, error reporting, or remote logging.** Ever.
+- **Outbound HTTPS allowed only to `gmail.googleapis.com`** (Gmail API), and only when the user has explicitly OAuthed. No other third-party domains.
+- **`host_permissions` is locked to `https://gmail.googleapis.com/*`.** Adding any other entry requires updating architecture.md first.
+- **OAuth scope is locked to `gmail.metadata`** (sensitive, not restricted). Restricted scopes (`gmail.readonly` etc.) are off-limits without explicit acceptance of CASA cost.
+- **No `chrome.*` or DOM imports in `src/lib/`** — `storage.ts` and `gmail-api.ts` are the only allowed exceptions.
 - **Amount is cents (integer).** Never float. If a float touches storage, it's a bug.
 - **Types use `service` and `cadence`** — not `serviceName` or `billingCycle`. `types.ts` is source of truth for naming.
 - **No runtime dependencies** without asking. Stdlib only.

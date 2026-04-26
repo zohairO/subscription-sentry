@@ -6,7 +6,15 @@ Date-stamped architectural and product decisions. Most recent at top.
 
 ## 2026-04-26
 
-- going through google takeout is too slow and introduces a lot of friction for a user as it can take upto for the data to be ready to be dropped into the extension. A faster and better solution that mitigates the friction is to use OAuth and make API requests in chunks to get users gmail data. (READ THIS BEFORE NEXT SESSION)
+- **Google Takeout dropped as primary data source.** 24–48h latency is unacceptable for "useful to me today" UX.
+- **Path A chosen: OAuth + `gmail.metadata` scope.** Sensitive (not restricted), no CASA, free Google verification keeps the publish path open. Trade-off accepted: no email body, so amount can only come from subject lines (~50–60% of services) or one-time manual entry per service.
+- **Architectural exception granted:** `host_permissions: ["https://gmail.googleapis.com/*"]` is now allowed. This is the *only* exception; no other host_permission entry without an architectural review.
+- **Network-egress promise refined.** From "zero network egress" to "no egress *of user data to third parties* — only authenticated reads of the user's own data from Google's API." Update propagated to architecture.md and CLAUDE.md.
+- **Restricted scopes (`gmail.readonly`, etc.) remain off-limits** until user explicitly accepts CASA Tier 2 cost ($5–15K). Path B is documented as the escape hatch if amount-from-subject coverage proves insufficient.
+- **`mbox-parser.ts` removed from the source tree.** Lives in git history (commit `122cb88`) and is restorable. No longer the library candidate; `gmail-api.ts` takes that slot.
+- **Path C (Gmail UI scrape) held in reserve** as documented fallback if Google tightens metadata scope or verification stalls. All paths recorded in architecture.md § "Email data source: paths considered."
+
+(Original brief note from this date preserved in git history at the previous version of this file.)
 
 
 ## 2026-04-24
