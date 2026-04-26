@@ -4,6 +4,35 @@ Substantive work by session. Most recent at top.
 
 ---
 
+## 2026-04-26
+
+- **Major pivot: dropped Google Takeout / mbox import; adopted OAuth + `gmail.metadata` scope.** Reason: Takeout data takes 24–48h to be ready, which is a hard friction wall. See `memory-decisions.md` for the full decision and architecture.md § "Email data source: paths considered" for the path comparison.
+- **Updated `architecture.md` and `CLAUDE.md`** to reflect:
+  - Single `host_permissions` exception (`gmail.googleapis.com`).
+  - "Zero network egress" → "no egress *of user data to third parties*; authenticated reads of the user's own data from Google are OK."
+  - OAuth scope locked to `gmail.metadata` (sensitive, no CASA). Restricted scopes off-limits.
+  - `gmail-api.ts` replaces `mbox-parser.ts` as the lone library candidate.
+- **Wrote `src/lib/gmail-api.ts`** — OAuth token mgmt, scan loop with progress callback. Per-service: `from:(domains) newer_than:1y` then `messages.get?format=metadata`.
+- **Reshaped `src/lib/subscription-matchers.ts`** — `senders: string[]` (used both for Gmail query and substring sender matching) and `amountInSubject?: boolean` flag per service.
+- **Deleted `src/lib/mbox-parser.ts`** (preserved at commit `122cb88`).
+- **Rewrote options page** (`html`/`ts`/`css`) — Connect/Scan/Disconnect flow, inline editable match grid (service/amount/currency/cadence/confidence) with per-row checkbox and "amount needed" yellow highlight when extraction failed.
+- **Updated `manifest.json`** — added `identity` permission, `host_permissions: ["https://gmail.googleapis.com/*"]`, and `oauth2` block with placeholder client_id.
+- **Updated `README.md`** with full Gmail OAuth setup walkthrough (GCP project → enable API → consent screen → extension ID → OAuth Chrome Extension client → paste `client_id` into `manifest.json` → rebuild).
+- **Upgraded `@crxjs/vite-plugin` from beta.25 → 2.4.0 stable.** Fixes the "extension reloaded itself too frequently" / WebSocket 400 issue with `npm run dev`.
+- **Build + typecheck green.** dist/ ~32 KB unminified.
+
+### Open threads (pick up next session)
+
+- **User must replace OAuth `client_id` placeholder** in `manifest.json` and rebuild before "Connect Gmail" works. Setup steps in README.
+- **Verify the full v1 flow once OAuth client_id is set**:
+  1. Connect Gmail → consent screen appears.
+  2. Scan inbox → progress increments through 24 services.
+  3. Edit any rows where amount wasn't extracted (Netflix, Disney+, Microsoft 365, etc. — typically the non-Stripe services).
+  4. Import → subs appear in popup.
+  5. Visit a real checkout page → overlay fires.
+- **Per-environment OAuth client**: dev (unpacked) and Web Store (published) IDs differ. For now, use the dev OAuth client; if/when publishing, create a second one keyed to the Web Store extension ID.
+- **Icons**: still placeholder. Lowest priority.
+
 ## 2026-04-24
 
 - Added `CLAUDE.md` session playbook (operational companion to `architecture.md`).
