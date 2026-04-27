@@ -2,37 +2,49 @@ import type { Cadence } from '../types';
 
 export interface ServicePattern {
   service: string;
-  senderRegex: RegExp;
+  /**
+   * Sender domains/addresses used to (a) build the Gmail `from:` query and
+   * (b) match parsed metadata. Plain strings; the matcher does substring
+   * checks so the canonical domain is enough.
+   */
+  senders: string[];
+  /** Optional regex over subject to confirm a match (filters out noise from the same sender). */
   subjectHints?: RegExp;
+  /**
+   * If true, this service's receipt subject typically contains the amount,
+   * so we should attempt to extract it from the subject directly.
+   * Defaults to false; user enters amount manually for these.
+   */
+  amountInSubject?: boolean;
   defaultCurrency?: string;
   defaultCadence?: Cadence;
 }
 
 export const KNOWN_SERVICES: ServicePattern[] = [
-  { service: 'Netflix', senderRegex: /@(mailer\.netflix\.com|netflix\.com)/i, subjectHints: /billing|payment|receipt|membership/i, defaultCadence: 'monthly' },
-  { service: 'Spotify', senderRegex: /@(spotify\.com|email\.spotify\.com)/i, subjectHints: /receipt|invoice|premium|subscription/i, defaultCadence: 'monthly' },
-  { service: 'Disney+', senderRegex: /@(mail\.disneyplus\.com|disneyplus\.com)/i, subjectHints: /receipt|subscription|billing/i },
-  { service: 'Apple', senderRegex: /no_reply@email\.apple\.com/i, subjectHints: /(your )?receipt from apple|subscription/i },
-  { service: 'YouTube Premium', senderRegex: /@(youtube\.com|google\.com)/i, subjectHints: /youtube (premium|music)/i, defaultCadence: 'monthly' },
-  { service: 'Google One', senderRegex: /payments-noreply@google\.com/i, subjectHints: /google one|google storage|receipt/i, defaultCadence: 'monthly' },
-  { service: 'Adobe Creative Cloud', senderRegex: /@(adobe\.com|mail\.adobe\.com)/i, subjectHints: /creative cloud|invoice|receipt/i },
-  { service: 'Microsoft 365', senderRegex: /@(microsoft\.com|email\.microsoft\.com)/i, subjectHints: /microsoft 365|office 365|subscription/i },
-  { service: 'Amazon Prime', senderRegex: /@(amazon\.com|amazon\.com\.au|amazon\.co\.uk)/i, subjectHints: /prime (membership|renewal)/i, defaultCadence: 'yearly' },
-  { service: 'HBO Max', senderRegex: /@(mail\.hbomax\.com|max\.com)/i, subjectHints: /subscription|receipt/i },
-  { service: 'Hulu', senderRegex: /@(hulumail\.com|hulu\.com)/i, subjectHints: /receipt|billing/i },
-  { service: 'Dropbox', senderRegex: /no-reply@dropbox\.com/i, subjectHints: /dropbox (plus|family|professional)|receipt/i },
-  { service: 'iCloud+', senderRegex: /no_reply@email\.apple\.com/i, subjectHints: /icloud/i, defaultCadence: 'monthly' },
-  { service: 'ChatGPT Plus', senderRegex: /@(stripe|openai)\.com/i, subjectHints: /chatgpt|openai/i, defaultCadence: 'monthly' },
-  { service: 'Claude Pro', senderRegex: /@(stripe|anthropic)\.com/i, subjectHints: /claude|anthropic/i, defaultCadence: 'monthly' },
-  { service: 'GitHub', senderRegex: /@github\.com/i, subjectHints: /receipt for github|invoice/i },
-  { service: 'Notion', senderRegex: /@(notion\.so|mail\.notion\.so)/i, subjectHints: /receipt|invoice|subscription/i },
-  { service: 'Linear', senderRegex: /@linear\.app/i, subjectHints: /invoice|receipt/i },
-  { service: 'Figma', senderRegex: /@figma\.com/i, subjectHints: /invoice|receipt/i },
-  { service: 'Audible', senderRegex: /@audible\.com/i, subjectHints: /membership|receipt/i, defaultCadence: 'monthly' },
-  { service: 'The New York Times', senderRegex: /@(nytimes\.com|email\.newyorktimes\.com)/i, subjectHints: /subscription|receipt/i },
-  { service: 'Stan', senderRegex: /@(stan\.com\.au|mail\.stan\.com\.au)/i, subjectHints: /subscription|receipt/i, defaultCurrency: 'AUD', defaultCadence: 'monthly' },
-  { service: 'Binge', senderRegex: /@binge\.com\.au/i, subjectHints: /subscription|receipt/i, defaultCurrency: 'AUD', defaultCadence: 'monthly' },
-  { service: 'Kayo Sports', senderRegex: /@kayosports\.com\.au/i, subjectHints: /subscription|receipt/i, defaultCurrency: 'AUD', defaultCadence: 'monthly' },
+  { service: 'Netflix', senders: ['mailer.netflix.com', 'netflix.com'], subjectHints: /billing|payment|receipt|membership/i, defaultCadence: 'monthly' },
+  { service: 'Spotify', senders: ['email.spotify.com', 'spotify.com'], subjectHints: /receipt|invoice|premium|subscription/i, amountInSubject: true, defaultCadence: 'monthly' },
+  { service: 'Disney+', senders: ['mail.disneyplus.com', 'disneyplus.com'], subjectHints: /receipt|subscription|billing/i },
+  { service: 'Apple', senders: ['no_reply@email.apple.com', 'email.apple.com'], subjectHints: /(your )?receipt from apple|subscription/i, amountInSubject: true },
+  { service: 'YouTube Premium', senders: ['youtube.com'], subjectHints: /youtube (premium|music)/i, defaultCadence: 'monthly' },
+  { service: 'Google One', senders: ['payments-noreply@google.com'], subjectHints: /google one|google storage|receipt/i, amountInSubject: true, defaultCadence: 'monthly' },
+  { service: 'Adobe Creative Cloud', senders: ['mail.adobe.com', 'adobe.com'], subjectHints: /creative cloud|invoice|receipt/i },
+  { service: 'Microsoft 365', senders: ['email.microsoft.com', 'microsoft.com'], subjectHints: /microsoft 365|office 365|subscription/i },
+  { service: 'Amazon Prime', senders: ['amazon.com', 'amazon.com.au', 'amazon.co.uk'], subjectHints: /prime (membership|renewal)/i, defaultCadence: 'yearly' },
+  { service: 'HBO Max', senders: ['mail.hbomax.com', 'max.com'], subjectHints: /subscription|receipt/i },
+  { service: 'Hulu', senders: ['hulumail.com', 'hulu.com'], subjectHints: /receipt|billing/i },
+  { service: 'Dropbox', senders: ['no-reply@dropbox.com', 'dropbox.com'], subjectHints: /dropbox (plus|family|professional)|receipt/i },
+  { service: 'iCloud+', senders: ['no_reply@email.apple.com'], subjectHints: /icloud/i, defaultCadence: 'monthly' },
+  { service: 'ChatGPT Plus', senders: ['stripe.com', 'openai.com'], subjectHints: /chatgpt|openai/i, amountInSubject: true, defaultCadence: 'monthly' },
+  { service: 'Claude Pro', senders: ['stripe.com', 'anthropic.com'], subjectHints: /claude|anthropic/i, amountInSubject: true, defaultCadence: 'monthly' },
+  { service: 'GitHub', senders: ['github.com'], subjectHints: /receipt for github|invoice/i, amountInSubject: true },
+  { service: 'Notion', senders: ['notion.so', 'mail.notion.so'], subjectHints: /receipt|invoice|subscription/i, amountInSubject: true },
+  { service: 'Linear', senders: ['linear.app'], subjectHints: /invoice|receipt/i, amountInSubject: true },
+  { service: 'Figma', senders: ['figma.com'], subjectHints: /invoice|receipt/i, amountInSubject: true },
+  { service: 'Audible', senders: ['audible.com'], subjectHints: /membership|receipt/i, defaultCadence: 'monthly' },
+  { service: 'The New York Times', senders: ['nytimes.com', 'email.newyorktimes.com'], subjectHints: /subscription|receipt/i },
+  { service: 'Stan', senders: ['stan.com.au', 'mail.stan.com.au'], subjectHints: /subscription|receipt/i, defaultCurrency: 'AUD', defaultCadence: 'monthly' },
+  { service: 'Binge', senders: ['binge.com.au'], subjectHints: /subscription|receipt/i, defaultCurrency: 'AUD', defaultCadence: 'monthly' },
+  { service: 'Kayo Sports', senders: ['kayosports.com.au'], subjectHints: /subscription|receipt/i, defaultCurrency: 'AUD', defaultCadence: 'monthly' },
 ];
 
 const CURRENCY_PATTERNS: Array<[string, RegExp]> = [
@@ -68,4 +80,17 @@ export function extractCadence(text: string): Cadence {
     if (re.test(text)) return cadence;
   }
   return 'unknown';
+}
+
+/** True if `from` (the email From header) matches any of the service's sender patterns. */
+export function matchesSender(from: string, pattern: ServicePattern): boolean {
+  const lc = from.toLowerCase();
+  return pattern.senders.some(s => lc.includes(s.toLowerCase()));
+}
+
+/** Build the Gmail `from:` query fragment for a service. */
+export function gmailFromQuery(pattern: ServicePattern): string {
+  if (pattern.senders.length === 0) return '';
+  if (pattern.senders.length === 1) return `from:(${pattern.senders[0]})`;
+  return `from:(${pattern.senders.join(' OR ')})`;
 }

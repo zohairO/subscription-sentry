@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Subscription Sentry — Settings</title>
+    <link rel="stylesheet" href="./options.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Subscription Sentry</h1>
+      <p class="tag">Local only. Gmail metadata read directly; nothing else leaves your device.</p>
+
+      <section>
+        <h2>Connect Gmail</h2>
+        <p class="hint">
+          Connect your Gmail to scan for known subscription services. We use
+          the <code>gmail.metadata</code> scope, which means we read sender,
+          subject, and date — never email bodies. You stay in control: revoke
+          anytime.
+        </p>
+        <div id="auth-status" class="status"></div>
+        <div class="row">
+          <button id="connect-btn" class="primary">Connect Gmail</button>
+          <button id="scan-btn" class="primary" hidden>Scan inbox</button>
+          <button id="disconnect-btn" hidden>Disconnect</button>
+        </div>
+
+        <div id="scan-progress" class="status" hidden></div>
+        <div id="scan-error" class="status error" hidden></div>
+
+        <div id="matches" hidden>
+          <div class="matches-header">
+            <span>Service</span>
+            <span>Amount</span>
+            <span>Currency</span>
+            <span>Cadence</span>
+            <span>Confidence</span>
+          </div>
+          <div id="matches-list"></div>
+          <div class="matches-footer">
+            <button id="import-btn" class="primary">Import selected</button>
+            <button id="cancel-btn">Discard</button>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Current subscriptions</h2>
+        <ul id="subs" class="subs"></ul>
+      </section>
+
+      <section>
+        <h2>Settings</h2>
+        <label class="toggle">
+          <input type="checkbox" id="overlay-enabled" />
+          <span>Show checkout-page reminder overlay</span>
+        </label>
+      </section>
+    </main>
+    <script type="module" src="./options.ts"></script>
+  </body>
+</html>
