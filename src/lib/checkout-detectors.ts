@@ -1,14 +1,16 @@
 import type { CheckoutSignal } from '../types';
 
 const URL_PATTERNS: Array<[RegExp, string, number]> = [
-  [/\/checkout(?:\/|\?|$)/i, 'url: /checkout', 3],
+  // Definitive: the URL itself names the act of paying. Worth threshold alone.
+  [/\/checkout(?:\/|\?|$)/i, 'url: /checkout', 4],
+  [/\/subscribe(?:\/|\?|$)/i, 'url: /subscribe', 4],
+  [/\/payment(?:\/|\?|$)/i, 'url: /payment', 4],
+  [/\/order\/.*(?:pay|checkout)/i, 'url: /order/pay', 4],
+  // Suggestive: needs corroborating signal (keyword / iframe / card field).
   [/\/cart(?:\/|\?|$)/i, 'url: /cart', 2],
-  [/\/subscribe(?:\/|\?|$)/i, 'url: /subscribe', 3],
   [/\/billing(?:\/|\?|$)/i, 'url: /billing', 2],
-  [/\/payment(?:\/|\?|$)/i, 'url: /payment', 3],
   [/\/upgrade(?:\/|\?|$)/i, 'url: /upgrade', 2],
   [/\/plan[s]?\/(?:select|choose)/i, 'url: /plans/select', 2],
-  [/\/order\/.*(?:pay|checkout)/i, 'url: /order/pay', 3],
 ];
 
 const KEYWORD_PATTERNS: Array<[RegExp, string]> = [

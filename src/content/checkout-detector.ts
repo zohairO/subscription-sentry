@@ -6,22 +6,42 @@ const OVERLAY_ID = '__subscription_sentry_overlay__';
 const DISMISS_KEY = '__subscription_sentry_dismissed__';
 
 async function main(): Promise<void> {
-  if (window.self !== window.top) return;
-  if (location.protocol === 'chrome:' || location.protocol === 'chrome-extension:') return;
-  if (sessionStorage.getItem(DISMISS_KEY)) return;
+  if (window.self !== window.top) {
+    console.debug('[sentry] skip: iframe');
+    return;
+  }
+  if (location.protocol === 'chrome:' || location.protocol === 'chrome-extension:') {
+    console.debug('[sentry] skip: chrome protocol');
+    return;
+  }
+  if (sessionStorage.getItem(DISMISS_KEY)) {
+    console.debug('[sentry] skip: dismissed this session');
+    return;
+  }
 
   const settings = await getSettings();
-  if (!settings.overlayEnabled) return;
+  if (!settings.overlayEnabled) {
+    console.debug('[sentry] skip: overlay disabled in settings');
+    return;
+  }
 
   // SPAs and checkout flows often populate after initial idle. Give it a beat.
   await wait(1200);
 
   const signal = detectCheckout();
-  if (!isCheckout(signal)) return;
+  console.debug('[sentry] checkout signal', signal);
+  if (!isCheckout(signal)) {
+    console.debug(`[sentry] skip: score ${signal.score} below threshold`);
+    return;
+  }
 
   const subs = (await getSubscriptions()).filter(s => !s.archived);
-  if (subs.length === 0) return;
+  if (subs.length === 0) {
+    console.debug('[sentry] skip: no subs saved yet');
+    return;
+  }
 
+  console.debug('[sentry] rendering overlay', { subs: subs.length });
   renderOverlay(subs);
 }
 
