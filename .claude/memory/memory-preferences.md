@@ -8,3 +8,4 @@ How the user wants to collaborate on this project.
 - **Decisions get recorded.** Architectural decisions → `.claude/rules/architecture.md`. Dated decisions → `.claude/memory/memory-decisions.md`.
 - **Correctness over ceremony.** Don't add features, abstractions, or error handling beyond what's asked for. Don't design for hypothetical future requirements.
 - **No em dashes in user-facing writing** (letters, deliverables). OK in prose this memory system itself.
+- **OK with `Co-Authored-By: Claude` trailer on commits.** User asked about it on 2026-04-27 and accepted the AI-assisted attribution. Don't strip it; don't ask again.
