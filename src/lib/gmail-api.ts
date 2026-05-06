@@ -179,21 +179,31 @@ export async function scanInbox(
   return results;
 }
 
+const SCAN_CANDIDATES_PER_SERVICE = 10;
+
 async function scanService(token: string, pattern: ServicePattern): Promise<ServiceMatch | null> {
   const fromQ = gmailFromQuery(pattern);
   if (!fromQ) return null;
   const query = `${fromQ} newer_than:1y`;
 
-  const ids = await listMessages(token, query, 1);
+  const ids = await listMessages(token, query, SCAN_CANDIDATES_PER_SERVICE);
   if (ids.length === 0) return null;
-  const messageId = ids[0]!;
 
-  const meta = await getMessageMetadata(token, messageId);
-  const from = meta.headers['from'] ?? '';
-  const subject = meta.headers['subject'] ?? '';
-
-  if (!matchesSender(from, pattern)) return null;
-  if (pattern.subjectHints && !pattern.subjectHints.test(subject)) return null;
+  let meta: GmailMetadata | null = null;
+  let from = '';
+  let subject = '';
+  for (const id of ids) {
+    const m = await getMessageMetadata(token, id);
+    const f = m.headers['from'] ?? '';
+    const s = m.headers['subject'] ?? '';
+    if (!matchesSender(f, pattern)) continue;
+    if (pattern.subjectHints && !pattern.subjectHints.test(s)) continue;
+    meta = m;
+    from = f;
+    subject = s;
+    break;
+  }
+  if (!meta) return null;
 
   let amount: number | undefined;
   let currency: string | undefined;

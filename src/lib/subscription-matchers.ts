@@ -24,7 +24,7 @@ export const KNOWN_SERVICES: ServicePattern[] = [
   { service: 'Netflix', senders: ['mailer.netflix.com', 'netflix.com'], subjectHints: /billing|payment|receipt|membership/i, defaultCadence: 'monthly' },
   { service: 'Spotify', senders: ['email.spotify.com', 'spotify.com'], subjectHints: /receipt|invoice|premium|subscription/i, amountInSubject: true, defaultCadence: 'monthly' },
   { service: 'Disney+', senders: ['mail.disneyplus.com', 'disneyplus.com'], subjectHints: /receipt|subscription|billing/i },
-  { service: 'Apple', senders: ['no_reply@email.apple.com', 'email.apple.com'], subjectHints: /(your )?receipt from apple|subscription/i, amountInSubject: true },
+  { service: 'Apple', senders: ['no_reply@email.apple.com', 'email.apple.com'], subjectHints: /(your )?(tax )?(invoice|receipt) from apple|apple subscription/i, amountInSubject: true },
   { service: 'YouTube Premium', senders: ['youtube.com'], subjectHints: /youtube (premium|music)/i, defaultCadence: 'monthly' },
   { service: 'Google One', senders: ['payments-noreply@google.com'], subjectHints: /google one|google storage|receipt/i, amountInSubject: true, defaultCadence: 'monthly' },
   { service: 'Adobe Creative Cloud', senders: ['mail.adobe.com', 'adobe.com'], subjectHints: /creative cloud|invoice|receipt/i },
