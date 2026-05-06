@@ -14,9 +14,9 @@
         <h2>Connect Gmail</h2>
         <p class="hint">
           Connect your Gmail to scan for known subscription services. We use
-          the <code>gmail.metadata</code> scope, which means we read sender,
-          subject, and date — never email bodies. You stay in control: revoke
-          anytime.
+          the <code>gmail.readonly</code> scope so we can search by sender. We
+          only read sender, subject, and date headers locally — bodies are not
+          stored. You stay in control: revoke anytime.
         </p>
         <div id="auth-status" class="status"></div>
         <div class="row">

@@ -4,6 +4,15 @@ Date-stamped architectural and product decisions. Most recent at top.
 
 ---
 
+## 2026-05-06
+
+- **Pivoted from `gmail.metadata` → `gmail.readonly`.** Discovered during first end-to-end OAuth verification that the metadata scope rejects the `q` parameter on `messages.list` (403: "Metadata scope does not support 'q' parameter"). Without `q`, sender-targeted search is impossible — the only fallback inside metadata is enumerating the entire inbox and filtering client-side, which is quota-prohibitive for a year of mail.
+- **Trade-off accepted:** `gmail.readonly` is a restricted scope. Personal/local use is unaffected (no verification needed for testing-mode OAuth on your own account). Web Store publish now requires CASA Tier 2 ($5–15K) OR pivoting to Path C (content-script scrape) before shipping.
+- **Path A is now marked Rejected in architecture.md**, Path B (`gmail.readonly`) is CHOSEN, Path C (Gmail UI scrape) remains the documented fallback.
+- **Body access is unlocked but unused today.** Matchers still read sender/subject/date headers only. Body parsing for amount extraction is a future option, not a current dependency.
+- **Files updated:** `manifest.json` (scope), `src/lib/gmail-api.ts` (`GMAIL_METADATA_SCOPE` → `GMAIL_SCOPE`), `src/options/options.html` (user-facing copy), `architecture.md`, `CLAUDE.md`.
+- **User must reconnect Gmail** after this change — the cached OAuth token is still scoped to `gmail.metadata`. Click Disconnect → Connect Gmail to grant the new scope.
+
 ## 2026-04-26
 
 - **Google Takeout dropped as primary data source.** 24–48h latency is unacceptable for "useful to me today" UX.

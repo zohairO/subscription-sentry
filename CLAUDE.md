@@ -30,7 +30,7 @@ No test runner is wired up yet. When tests get added, matchers and `gmail-api.ts
 - **No telemetry, analytics, error reporting, or remote logging.** Ever.
 - **Outbound HTTPS allowed only to `gmail.googleapis.com`** (Gmail API), and only when the user has explicitly OAuthed. No other third-party domains.
 - **`host_permissions` is locked to `https://gmail.googleapis.com/*`.** Adding any other entry requires updating architecture.md first.
-- **OAuth scope is locked to `gmail.metadata`** (sensitive, not restricted). Restricted scopes (`gmail.readonly` etc.) are off-limits without explicit acceptance of CASA cost.
+- **OAuth scope is `gmail.readonly`** (restricted). Personal/local use only — CASA verification ($5–15K) becomes mandatory before any Web Store publish. Do not broaden further (`gmail.modify`, `gmail.send`, etc.) without revisiting architecture.md.
 - **No `chrome.*` or DOM imports in `src/lib/`** — `storage.ts` and `gmail-api.ts` are the only allowed exceptions.
 - **Amount is cents (integer).** Never float. If a float touches storage, it's a bug.
 - **Types use `service` and `cadence`** — not `serviceName` or `billingCycle`. `types.ts` is source of truth for naming.

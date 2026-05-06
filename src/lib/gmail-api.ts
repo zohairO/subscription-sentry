@@ -10,7 +10,7 @@ import {
 } from './subscription-matchers';
 
 const GMAIL_BASE = 'https://gmail.googleapis.com/gmail/v1';
-export const GMAIL_METADATA_SCOPE = 'https://www.googleapis.com/auth/gmail.metadata';
+export const GMAIL_SCOPE = 'https://www.googleapis.com/auth/gmail.readonly';
 
 /** A single Gmail message reduced to the headers we care about. */
 interface GmailMetadata {

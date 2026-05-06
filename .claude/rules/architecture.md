@@ -20,30 +20,33 @@ A Chrome extension (Manifest V3) that tracks the user's recurring subscriptions 
 
 ## Email data source: paths considered
 
-This decision was rebuilt on 2026-04-26 after Google Takeout's 24–48 hour latency proved unacceptable. The chosen path is **A**. Other paths are recorded so we can revisit if A breaks.
+This decision has now been rebuilt twice. Currently on **B** (OAuth + `gmail.readonly`) for personal/local use. Revisit before any Web Store publish — CASA cost is the gating question.
 
 | Path | What it is | Personal friction | Publish friction | Status |
 |---|---|---|---|---|
-| **A. OAuth + `gmail.metadata`** | User OAuths once. Extension calls Gmail API for metadata-only (sender/subject/date). Match in-process. | ~3 clicks, ~30s scan. 7-day re-auth in Testing mode; none in Production. | Sensitive scope, free Google verification (4–8 weeks). **No CASA.** | **CHOSEN.** |
-| B. OAuth + `gmail.readonly` | Same as A but with body access (full amount extraction). | Same as A. | **Restricted scope. CASA Tier 2 ($5–15K).** Hard wall. | Rejected. |
-| C. Content-script scrape `mail.google.com` | Inject into Gmail's web UI; parse the search-results DOM. | Zero auth. Requires user to be logged into Gmail. | No new permissions; ToS gray area; brittle to DOM changes. | Held in reserve. |
-| D. Google Takeout `.mbox` | User exports Gmail via Takeout, drops `.mbox` into options page. | **24–48 hour wait. Multi-GB download.** Setup only. | None. Strict zero-network. | Rejected (initial v1 path; latency killed it). |
+| A. OAuth + `gmail.metadata` | OAuth, then call Gmail API for metadata-only (sender/subject/date). Match in-process. | ~3 clicks, ~30s scan. 7-day re-auth in Testing mode; none in Production. | Sensitive scope, free Google verification (4–8 weeks). **No CASA.** | **Rejected 2026-05-06.** Metadata scope does not support `q` parameter on `messages.list`, so per-sender search is impossible. Filtering client-side over the full inbox is quota-prohibitive. |
+| **B. OAuth + `gmail.readonly`** | Same as A but with body access and full search support (`q` works). | Same as A. | **Restricted scope. CASA Tier 2 ($5–15K).** Hard wall for publish. | **CHOSEN 2026-05-06** for personal/local use. CASA only matters at publish time; revisit then. |
+| C. Content-script scrape `mail.google.com` | Inject into Gmail's web UI; parse the search-results DOM. | Zero auth. Requires user to be logged into Gmail. | No new permissions; ToS gray area; brittle to DOM changes. | Held in reserve. Documented fallback if B becomes untenable AND CASA is unacceptable. |
+| D. Google Takeout `.mbox` | User exports Gmail via Takeout, drops `.mbox` into options page. | **24–48 hour wait. Multi-GB download.** Setup only. | None. Strict zero-network. | Rejected 2026-04-26 (latency). |
 | E. Bank/card transactions (Basiq AU, Plaid US) | Read recurring charges from the user's bank instead of email. | New trust ask (bank credentials). Vendor pricing. | Different product entirely; not local-first. | Rejected for v1. |
 
-**Trade-offs accepted with A:**
+**Trade-offs accepted with B:**
 
-- **No body access.** Amount can only be inferred from subject lines. ~50–60% of services include amount in subject (Spotify, Apple, most Stripe-issued). The rest require one-time manual amount entry per service.
-- **Single architectural exception** to "no `host_permissions`": `https://gmail.googleapis.com/*` is now allowed (and only that). See *Permissions posture* below.
+- **Restricted OAuth scope.** Personal use is fine — verification/CASA only matters at publish. Going to Web Store later means either paying for CASA, stripping the Gmail scan back out, or pivoting to C.
+- **Body access available but not used today.** Current matchers only read sender/subject/date headers. Body parsing (full amount extraction) is unlocked by the scope but deferred — keep the surface area small until coverage gaps prove it's needed.
+- **Single architectural exception** to "no `host_permissions`": `https://gmail.googleapis.com/*` is allowed (and only that). See *Permissions posture* below.
 - **One outbound third-party call.** The "zero network egress" promise is refined to "no egress *of user data to third parties* — only authenticated reads of the user's own data from Google."
 
-If A becomes untenable (e.g. Google tightens metadata scope, verification stalls), **C** is the documented fallback. **B** is the documented escape hatch if amount-from-subject coverage proves insufficient and CASA cost becomes acceptable.
+**Why A failed:** the metadata scope's `messages.list` rejects the `q` parameter with a 403 ("Metadata scope does not support 'q' parameter"). Without query support, the only way to find sender-specific messages is to enumerate the full inbox and filter client-side — thousands of `messages.get` calls per scan. Discovered 2026-05-06 during first end-to-end verification.
+
+**If B becomes untenable** (Google revokes the OAuth client, CASA becomes mandatory before personal use, etc.): pivot to **C** (content-script scrape).
 
 ## What's important
 
 - Overlay UX at the moment of checkout. Non-intrusive, dismissible, accurate per-currency total.
 - Gmail-scan reliability for the top ~25 services (Netflix, Spotify, Apple, Google, Adobe, Microsoft, Amazon, Australian streaming).
 - Bounded network egress: exactly one third-party domain, only when the user has authorised it.
-- Staying publish-compatible: scoped permissions, single-domain `host_permissions`, sensitive (not restricted) OAuth scope.
+- Staying publish-flexible: scoped permissions, single-domain `host_permissions`. OAuth scope is restricted (`gmail.readonly`); revisit at publish time.
 
 ## What's not important
 
@@ -88,7 +91,7 @@ interface Subscription {
 
 - `permissions`: `storage`, `activeTab`, `identity`.
 - `host_permissions`: **`https://gmail.googleapis.com/*` only.** Single-domain, scoped to Gmail API. Adding any other entry without architectural review is forbidden.
-- `oauth2.scopes`: `https://www.googleapis.com/auth/gmail.metadata` only. Sensitive, not restricted; no CASA required.
+- `oauth2.scopes`: `https://www.googleapis.com/auth/gmail.readonly` only. **Restricted scope** — fine for personal/local use; CASA required before Web Store publish. Body access is unlocked but unused today; matchers still read headers only.
 - `content_scripts.matches`: `<all_urls>` — unavoidable for the overlay feature, and legitimate. If publishing: privacy policy states "metadata only, processed locally," and an onboarding screen explains why the extension reads pages.
 
 If a new feature appears to require a different host_permission entry or a restricted OAuth scope, **stop and revisit this decision** rather than adding it.

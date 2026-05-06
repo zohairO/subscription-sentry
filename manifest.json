@@ -6,8 +6,8 @@
   "permissions": ["storage", "activeTab", "identity"],
   "host_permissions": ["https://gmail.googleapis.com/*"],
   "oauth2": {
-    "client_id": "REPLACE_WITH_YOUR_OAUTH_CLIENT_ID.apps.googleusercontent.com",
-    "scopes": ["https://www.googleapis.com/auth/gmail.metadata"]
+    "client_id": "76154033826-i8548smf36anvgtd3gqklurslppukclk.apps.googleusercontent.com",
+    "scopes": ["https://www.googleapis.com/auth/gmail.readonly"]
   },
   "action": {
     "default_popup": "src/popup/popup.html",
